@@ -41,7 +41,7 @@ jobs:
       - name: Construir imagem Docker
         run: docker build --pull -t fiap-devsecops:ci .
       - name: Procurar CVEs criticos
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: fiap-devsecops:ci
           format: table
