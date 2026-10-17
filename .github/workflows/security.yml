@@ -1,0 +1,51 @@
+name: Security Pipeline
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  gitleaks:
+    name: Gitleaks - Segredos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Verificar segredos
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+  semgrep:
+    name: Semgrep - Codigo vulneravel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v6
+      - name: Preparar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Instalar Semgrep
+        run: python -m pip install semgrep
+      - name: Procurar codigo vulneravel
+        run: semgrep scan --config .semgrep.yml --error --metrics=off .
+
+  trivy:
+    name: Trivy - CVEs criticos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v6
+      - name: Construir imagem Docker
+        run: docker build --pull -t fiap-devsecops:ci .
+      - name: Procurar CVEs criticos
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          image-ref: fiap-devsecops:ci
+          format: table
+          severity: CRITICAL
+          exit-code: '1'
+          scanners: vuln
+          vuln-type: os,library

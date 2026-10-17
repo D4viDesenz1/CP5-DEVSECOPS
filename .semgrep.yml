@@ -1,0 +1,6 @@
+rules:
+  - id: fiap-python-eval
+    message: "Uso de eval() pode permitir execucao de codigo nao confiavel."
+    severity: ERROR
+    languages: [python]
+    pattern: eval(...)

@@ -1,0 +1,10 @@
+title = "FIAP - Segredos"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "fiap-chave-falsa"
+description = "Segredo ficticio criado apenas para o teste do checkpoint"
+regex = '''FIAP_TEST_SECRET_[A-Za-z0-9]{16}'''
+keywords = ["FIAP_TEST_SECRET_"]
